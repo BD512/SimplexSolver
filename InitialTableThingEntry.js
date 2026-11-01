@@ -287,7 +287,7 @@ class TableSetup{
         this.lower_container.className = "onecol-lower-container";
         this.next_func = next_func;
         this.label = document.createElement("label");
-        this.label.textContent = "Enter the initial table thing. If 2-stage, this should include the I row. If using big-M, enter any values with M in but don't enter brackets - expand them. If entering fractions, enter them as mixed fractions using /."
+        this.label.textContent = "Enter the initial table thing. If 2-stage, this should include the I row. If using big-M, enter any values with M in but don't enter brackets - expand them. If entering fractions, enter them as mixed fractions using /. Enter artificial variables in the last columns before the value column."
         this.container.appendChild(this.label);
         this.table_entry = new InitialTableEntry(this.container, decision_vars, slack_vars, artificial_vars, two_stage);
         this.feedback_label = document.createElement("label");

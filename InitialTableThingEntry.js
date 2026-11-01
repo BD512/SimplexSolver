@@ -89,10 +89,10 @@ class InitialTableInfoEntry {
         this.enter_button.textContent = "Enter";
         // this.enter_button.type = "button";
         this.enter_button.addEventListener("click", ()=>{this.enterItems()})
-        this.container.appendChild(this.enter_button);
         this.feedback_label = document.createElement("label");
         this.feedback_label.className = "feedback-label"; // todo make feedback labels red
         this.container.appendChild(this.feedback_label);
+        this.container.appendChild(this.enter_button);
     }
     enterItems(){
         let no_of_decision_vars = this.decision_vars_entry.getEntry();

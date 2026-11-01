@@ -73,7 +73,7 @@ class InitialTableInfoEntry {
         this.decision_vars_entry = new LabelledNumberInput(this.container, "Number of decision variables:");
         this.slack_vars_entry = new LabelledNumberInput(this.container, "Number of slack variables:");
         this.artificial_vars_entry = new LabelledNumberInput(this.container, "Number of artificial variables:");
-        this.is_two_stage_entry = new LabelledCheckBox(this.container, "Is two stage?");
+        this.is_two_stage_entry = new LabelledCheckBox(this.container, "Using two stage? (opposed to big-M)");
         this.is_two_stage_entry.hide();
         master_container.appendChild(this.container);
         this.updateNumberOfStages = () => {

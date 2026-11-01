@@ -8,13 +8,13 @@ function splitStringToNumAndMCoef(s){
         number = Infinity;
         m_coef = 0;
     } else if (s.length === 0){
-        return [false, "please fill entries"];
+        return [false, "Please fill entries"];
     } else if (!(s.includes("M"))){
         try{
             number = fraction(s);
             m_coef = fraction(0);
         } catch(err){
-            return [false, "invalid expression"+s];
+            return [false, "Invalid expression"+s];
         }
     } else if ([...s.matchAll(/M/g)].length !== 1){
         return [false, "too many Ms"];
@@ -22,9 +22,9 @@ function splitStringToNumAndMCoef(s){
         console.log("here1");
         let parts = s.split("+");
         if (parts.length > 2){
-            return [false, "invalid expression "+s];
+            return [false, "Invalid expression "+s];
         } else if (parts.length === 1) {
-            return [false, "invalid expression "+s];
+            return [false, "Invalid expression "+s];
         } else {
             console.log(parts[0][0][parts[0].length-1]);
             console.log(parts[1][parts[1].length-1]);
@@ -38,7 +38,7 @@ function splitStringToNumAndMCoef(s){
                         m_coef = fraction(parts[0].slice(0, parts[0].length-1));
                     }
                 } catch(err){
-                    return [false, "invalid expression"+s];
+                    return [false, "Invalid expression"+s];
                 }
 
             } else if (parts[1][parts[1].length-1] === "M") {
@@ -51,11 +51,11 @@ function splitStringToNumAndMCoef(s){
                         m_coef = fraction(parts[1].slice(0, parts[1].length-1));
                     }
                 } catch(err){
-                    return [false, "invalid expression"+s];
+                    return [false, "Invalid expression"+s];
                 }
 
             } else {
-                return [false, "invalid expression "+s];
+                return [false, "Invalid expression "+s];
             }
         }
     } else if (s.includes("-")) {
@@ -71,7 +71,7 @@ function splitStringToNumAndMCoef(s){
                         m_coef = -fraction(parts[1].slice(0, parts[1].length-1));
                     }
                 } catch(err){
-                    return [false, "invalid expression"+s];
+                    return [false, "Invalid expression"+s];
                 }
             } else if (parts[0][parts[0].length-1] === "M"){
                 try{
@@ -82,7 +82,7 @@ function splitStringToNumAndMCoef(s){
                         m_coef = fraction(parts[0].slice(0, parts[0].length-1));
                     }
                 } catch(err){
-                    return [false, "invalid expression"+s];
+                    return [false, "Invalid expression"+s];
                 }
             } else if (parts[1][parts[1].length-1] === "M") {
                 try{
@@ -93,10 +93,10 @@ function splitStringToNumAndMCoef(s){
                         m_coef = -fraction(parts[1].slice(0, parts[1].length-1));
                     }
                 } catch(err){
-                    return [false, "invalid expression"+s];
+                    return [false, "Invalid expression"+s];
                 }
             } else {
-                return [false, "invalid expression "+s];
+                return [false, "Invalid expression "+s];
             }
         } else if ([...s.matchAll(/-/g)].length === 2 && s[0] === "-"){
             parts.splice(0, 1);
@@ -110,7 +110,7 @@ function splitStringToNumAndMCoef(s){
                         m_coef = -fraction(parts[0].slice(0, parts[0].length-1));
                     }
                 } catch(err){
-                    return [false, "invalid expression"+s];
+                    return [false, "Invalid expression"+s];
                 }
             } else if (parts[1][parts[1].length-1] === "M") {
                 try{
@@ -121,13 +121,13 @@ function splitStringToNumAndMCoef(s){
                         m_coef = -fraction(parts[1].slice(0, parts[1].length-1));
                     }
                 } catch(err){
-                    return [false, "invalid expression"+s];
+                    return [false, "Invalid expression"+s];
                 }
             } else {
-                return [false, "invalid expression "+s];
+                return [false, "Invalid expression "+s];
             }
         } else {
-            return [false, "invalid expression "+s];
+            return [false, "Invalid expression "+s];
         }
     } else {
         if (s[s.length-1] === "M"){
@@ -139,11 +139,11 @@ function splitStringToNumAndMCoef(s){
                     number = fraction(0);
                     m_coef = fraction(s.slice(0, s.length-1));
                 } catch(err){
-                    return [false, "invalid expression"+s];
+                    return [false, "Invalid expression"+s];
                 }
             }
         } else {
-            return [false, "invalid expression "+s];
+            return [false, "Invalid expression "+s];
         }
     }
     // if (isNaN(number) || isNaN(m_coef)){

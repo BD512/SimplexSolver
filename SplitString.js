@@ -8,7 +8,7 @@ function splitStringToNumAndMCoef(s){
         number = Infinity;
         m_coef = 0;
     } else if (s.length === 0){
-        return [false, "Please fill entries"];
+        return [false, "Fill all entries"];
     } else if (!(s.includes("M"))){
         try{
             number = fraction(s);

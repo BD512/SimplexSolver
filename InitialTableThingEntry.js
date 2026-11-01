@@ -284,7 +284,7 @@ class TableSetup{
         master_container.appendChild(this.container);
         this.lower_container = document.createElement("div");
         master_container.appendChild(this.lower_container);
-        this.lower_container.className = "lower-container";
+        this.lower_container.className = "onecol-lower-container";
         this.next_func = next_func;
         this.label = document.createElement("label");
         this.label.textContent = "Enter the initial table thing. If 2-stage, this should include the I row and if using big-M, enter any values with M in but don't enter brackets - expand them."

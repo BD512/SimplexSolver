@@ -267,7 +267,7 @@ label {
     color: var(--text-grey);
 }
 
-
+/*
 @media (max-width: 650px) {
 
     body {
@@ -298,6 +298,8 @@ label {
         font-size: 10px;
     }
 }
+
+ */
 .feedback-label {
     color: red;
 }

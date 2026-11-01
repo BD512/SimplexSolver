@@ -267,39 +267,6 @@ label {
     color: var(--text-grey);
 }
 
-/*
-@media (max-width: 650px) {
-
-    body {
-        padding: 10px;
-    }
-
-    .section {
-        padding: 12px;
-    }
-
-    .initial-info {
-        grid-template-columns: 1fr;
-        gap: 15px;
-        padding: 16px;
-    }
-
-    .initial-table th,
-    .initial-table td,
-    .table_thing th,
-    .table_thing td {
-        padding: 3px 1px;
-    }
-
-    .initial-table input,
-    .table_thing input {
-        width: 95%;
-        padding: 2px 0;
-        font-size: 10px;
-    }
-}
-
- */
 .feedback-label {
     color: red;
 }

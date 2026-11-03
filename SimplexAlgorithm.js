@@ -7,6 +7,12 @@ export class TableThingRow {
         this.row_value = row_value;
         this.row_var_name = row_var_name;
     }
+    setVarCoef(var_name, value){
+        this.variables[var_name] = value;
+    }
+    setValue(new_value){
+        this.row_value = new_value;
+    }
     getValue(){
         return this.row_value
     }
@@ -65,6 +71,17 @@ export class TableThingRow {
 export class ObjectiveRow extends TableThingRow {
     constructor(variables, value, name){
         super(variables, value, name);
+    }
+    updateForBigM(annoying_rows){
+        // todo subtract the coefficients of each of the annoying rows multiplied by M
+        // also remember to do the same with row value
+        for (let annoying_row of annoying_rows){
+            for (let variable in this.variables){
+                let current_value = this.getVarCoef(variable).add(new SimplexNumber(0, 1).multiply(annoying_row.getVarCoef(variable)));
+                this.setVarCoef(variable, current_value);
+            }
+            this.row_value = this.getRowValue().subtract(new SimplexNumber(0, 1).multiply(annoying_row.getValue()));
+        }
     }
     getThetaValue(pivot_var_name) {
         return new SimplexNumber(Infinity);

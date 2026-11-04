@@ -58,7 +58,7 @@ class LabelledCheckBox{
 class LabelledTextInput{
     constructor(master_container, text){
         this.container = document.createElement("div")
-        this.container.className = "labelled-input";
+        this.container.className = "labelled-text-input";
         master_container.appendChild(this.container);
         this.label = document.createElement("label");
         this.label.textContent = text;
@@ -68,7 +68,7 @@ class LabelledTextInput{
         this.container.appendChild(this.entry);
     }
     getEntry(){
-        return this.entry.value; // todo check this
+        return this.entry.value;
     }
     hide(){
         this.container.style.visibility = "hidden";
@@ -83,5 +83,25 @@ class LabelledTextInput{
     }
 }
 
+class DropdownOptions {
+    constructor(master_container, options, update_function=()=>{}) {
+        this.container = document.createElement("select");
+        master_container.appendChild(this.container);
+        for (let option of options){
+            this.container.add(new Option(option[0], option[1]));
+        }
+        this.container.addEventListener("change", update_function);
+    }
+    getSelection(){
+        return this.container.value;
+    }
+    hide(){
+        this.container.style.display = "none";
+    }
+    show(){
+        this.container.style.display = "block";
+    }
+}
 
-export {LabelledNumberInput, LabelledCheckBox, LabelledTextInput};
+
+export {LabelledNumberInput, LabelledCheckBox, LabelledTextInput, DropdownOptions};

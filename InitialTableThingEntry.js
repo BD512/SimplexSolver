@@ -2,7 +2,8 @@ import splitStringToNumAndMCoef from "./SplitString.js";
 import SimplexNumber from "./SimplexNumber.js";
 import Simplex, {ObjectiveRow, TableThingRow, TheIRow, TwoStageSimplex} from "./SimplexAlgorithm.js";
 import TableThingEntry from "./TableThingEntry.js";
-import {LabelledNumberInput, LabelledCheckBox} from "./LabelledEntries.js";
+import {LabelledNumberInput, LabelledCheckBox, DropdownOptions} from "./LabelledEntries.js";
+// import SimplexSystem from "./index";
 
 class InitialTableInfoEntry {
     constructor(master_container, finished_func){
@@ -12,7 +13,7 @@ class InitialTableInfoEntry {
         // if 2 stage, enter number of artificial variables
         // is maximise or minimise
         this.container = document.createElement("div");
-        this.container.className = "initial-info";
+        this.container.className = "two-col-grid";
         this.finished_func = finished_func;
         // this.container.className = "FormContainer";
         this.decision_vars_entry = new LabelledNumberInput(this.container, "Number of decision variables:");
@@ -229,7 +230,7 @@ class TableSetup{
         master_container.appendChild(this.container);
         this.lower_container = document.createElement("div");
         master_container.appendChild(this.lower_container);
-        this.lower_container.className = "onecol-lower-container";
+        this.lower_container.className = "one-col-grid";
         this.next_func = next_func;
         this.label = document.createElement("label");
         this.label.textContent = "Enter the initial table thing. If 2-stage, this should include the I row. If using big-M, enter any values with M in but don't enter brackets - expand them. If entering fractions, enter them as mixed fractions using /. Enter artificial variables in the last columns before the value column."
@@ -260,97 +261,28 @@ class TableSetup{
 
 }
 
-export default class SimplexSystem {
-    constructor(master_container, simplex, show_initial_vals=false) {
+class FullInitialTableSetup{
+    constructor(master_container, feedback_function){
         this.container = document.createElement("div");
         master_container.appendChild(this.container);
-        this.tables_container = document.createElement("div");
-        this.lower_container = document.createElement("div");
-        this.lower_container.className = "lower-container";
-        this.container.appendChild(this.tables_container);
-        this.container.appendChild(this.lower_container);
-        this.simplex = simplex;
-        this.showing_answer = false;
-        this.tables = [];
-        this.current_table = new TableThingEntry(this.tables_container, 1, this.simplex, this.iterationFinished.bind(this));
-        if (show_initial_vals) {
-            this.current_table.showInitialValues();
-        }
-        this.next_table_button = document.createElement("button");
-        // this.next_table_button.type = "button";
-        this.next_table_button.addEventListener("click", this.nextButtonPressed.bind(this));
-        this.next_table_button.textContent = "Check";
-        this.lower_container.appendChild(this.next_table_button);
-        this.show_ans_button = document.createElement("button");
-        this.show_ans_button.id = "show_ans_button";
-        this.show_ans_button.textContent = "Show answer";
-        this.show_ans_button.addEventListener("click", () => {this.answerButtonPressed()});
-        this.lower_container.appendChild(this.show_ans_button);
-        this.feedback_label = document.createElement("label");
-        this.feedback_label.className = "feedback-label";
-        this.container.appendChild(this.feedback_label);
-        this.finished_label = document.createElement("label");
-        this.container.appendChild(this.finished_label);
+        this.feedback_function = feedback_function;
+        this.initial_setup = new InitialTableInfoEntry(this.container, this.enteredSetupInfo.bind(this));
+        this.initial_table_thing_entry = null;
     }
-    answerButtonPressed() {
-        if (this.showing_answer) {
-            this.current_table.hideAnswer();
-            this.show_ans_button.textContent = "Show answer";
-            this.showing_answer = true;
-            this.next_table_button.textContent = "Check";
-        } else {
-            this.current_table.showAnswer();
-            this.show_ans_button.textContent = "Hide answer";
-            this.showing_answer = false;
-            this.next_table_button.textContent = "Skip table";
-        }
-        this.showing_answer = !this.showing_answer;
+    enteredSetupInfo(decision_vars, slack_vars, artificial_vars, two_stage){
+        this.initial_table_thing_entry = new TableSetup(this.container, decision_vars, slack_vars, artificial_vars, two_stage, this.entered.bind(this));
     }
-    iterationFinished(){
-        console.log("finished an iteration!");
-        this.nextTable();
-        // this.next_table_button.textContent = "Next table";
+    entered(simplex, show_initial_vals=false){
+        this.feedback_function(simplex, show_initial_vals);
     }
-    nextButtonPressed(){
-        if (this.showing_answer){
-            this.nextTable();
-        } else {
-            this.checkAnswers();
-        }
+    hide(){
+        this.container.style.display = "none";
     }
-    checkAnswers(){
-        let is_correct = this.current_table.isFinished();
-        if (!is_correct){
-            this.feedback_label.textContent = "Some entries are incorrect or empty";
-        } else{
-            this.nextTable();
-        }
-    }
-    resetForIteration(){
-        this.show_ans_button.textContent = "Show answer";
-        this.showing_answer = false;
-        this.feedback_label.textContent = "";
-        this.next_table_button.textContent = "Check";
-    }
-    nextTable(){
-        // this.current_table.showAnswer();
-        this.resetForIteration();
-        this.tables.push(this.current_table);
-        let is_finished = this.simplex.performIteration();
-        if (is_finished && this.simplex.isStage1() && this.simplex.isZeroed()){
-            this.simplex = this.simplex.getStage2();
-        } else if (is_finished) {
-            this.showFinished();
-        } else {
-            this.current_table = new TableThingEntry(this.tables_container, 1, this.simplex, this.iterationFinished.bind(this));
-        }
-    }
-    showFinished(){
-        this.next_table_button.style.display = "none";
-        this.show_ans_button.style.display = "none";
-        this.feedback_label.style.display = "none";
-        this.finished_label.textContent = "Finished!!! Don't forget to state final values of the variables.";
+    show(){
+        this.container.style.display = "block";
     }
 }
 
-export {SimplexSystem, InitialTableInfoEntry, TableSetup};
+
+
+export {InitialTableInfoEntry, TableSetup, FullInitialTableSetup};

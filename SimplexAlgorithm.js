@@ -75,12 +75,18 @@ export class ObjectiveRow extends TableThingRow {
     updateForBigM(annoying_rows){
         // todo subtract the coefficients of each of the annoying rows multiplied by M
         // also remember to do the same with row value
+        console.log("variables.........", this.variables);
         for (let annoying_row of annoying_rows){
-            for (let variable in this.variables){
-                let current_value = this.getVarCoef(variable).add(new SimplexNumber(0, 1).multiply(annoying_row.getVarCoef(variable)));
-                this.setVarCoef(variable, current_value);
+            for (let variable in this.variables){ // keys?
+                console.log("idkidkidk", variable);
+                console.log("idkidkidk", annoying_row.getVarCoef(variable).getString());
+                if(variable !== annoying_row.getVarName()) {
+                    let current_value = ((this.getVarCoef(variable).multiply(new SimplexNumber(-1))).add(new SimplexNumber(0, 1).multiply(annoying_row.getVarCoef(variable)))).multiply(new SimplexNumber(-1));
+                    this.setVarCoef(variable, current_value);
+                }
             }
-            this.row_value = this.getRowValue().subtract(new SimplexNumber(0, 1).multiply(annoying_row.getValue()));
+            console.log(typeof this.getValue());
+            this.row_value = (this.getValue()).subtract(new SimplexNumber(0, 1).multiply(annoying_row.getValue()));
         }
     }
     getThetaValue(pivot_var_name) {

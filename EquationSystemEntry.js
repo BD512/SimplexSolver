@@ -2,50 +2,113 @@ import Simplex, {ObjectiveRow, TableThingRow, TheIRow, TwoStageSimplex} from "./
 import {LabelledCheckBox, LabelledTextInput} from "./LabelledEntries.js";
 import SimplexNumber from "./SimplexNumber.js";
 import {fraction} from "mathjs";
+import {DropdownOptions} from "./LabelledEntries.js";
 
-// todo add note about selecting first value as pivot value
+// todo add note about selecting first value as pivot value and fix instructions being shown
 // todo add inequality for all variables being bigger than zero
-// show inequalities system string after being entered
+// todo fix fill all cells error which is appearing instead of an invalid number error
 
-class DropdownOptions {
-    constructor(master_container, options, update_function=()=>{}) {
-        this.container = document.createElement("select");
+
+class DecisionVarsEntry{
+    constructor(master_container, feedback_function){
+        this.container = document.createElement("div");
+        this.container.className = "decision-vars-entry";
         master_container.appendChild(this.container);
-        for (let option of options){
-            this.container.add(new Option(option[0], option[1]));
-        }
-        this.container.addEventListener("change", update_function);
+        this.feedback_function = feedback_function;
+        this.entry = new LabelledTextInput(this.container, "Enter decision variable names seperated by commas:");
+        this.feedback_label = document.createElement("label");
+        this.feedback_label.className = "feedback-label";
+        this.enter_button = document.createElement("button");
+        this.enter_button.textContent = "Enter";
+        this.enter_button.addEventListener("click", ()=>{this.enterVariables()})
+        this.container.appendChild(this.enter_button);
+        this.container.appendChild(this.feedback_label);
     }
-    getSelection(){
-        return this.container.value;
+    enterVariables(){
+        let [valid, variables] = this.getDecisionVariables();
+        if (valid){
+            // this.variables = variables;
+            this.feedback_function(variables);
+        }
+    }
+    emptyErrorMessage(){
+        this.feedback_label.textContent = "Enter more than one value";
+    }
+    uniqueErrorMessage(){
+        this.feedback_label.textContent = "Variables must be unique";
+    }
+    emptyVarErrorMessage(){
+        this.feedback_label.textContent = "Variables must be something other than a space";
+    }
+    removeEntry(){
+        this.container.remove();
+    }
+    getDecisionVariables(){
+        let variables = this.entry.getEntry();
+        if (variables.trim().length === 0){
+            this.emptyErrorMessage();
+            return [false, null];
+        } else{
+            let vars_list = [];
+            for (let variable of variables.split(",")){
+                if (variable.trim().length === 0){
+                    this.emptyVarErrorMessage();
+                    return [false, null];
+                }
+                if (vars_list.includes(variable.trim())){
+                    this.uniqueErrorMessage();
+                    return [false, null];
+                }
+                vars_list.push(variable.trim());
+            }
+            console.log("vars list", vars_list);
+            return [true, vars_list];
+        }
+    }
+}
+
+class VarEntry{
+    constructor(master_container, var_name){
+        this.container = document.createElement("div");
+        master_container.appendChild(this.container);
+        this.container.className = "var-entry";
+        this.entry = document.createElement("input");
+        this.entry.type = "number";
+        this.container.appendChild(this.entry);
+        this.label = document.createElement("label");
+        this.label.textContent = var_name;
+        this.container.appendChild(this.label);
+    }
+    getEntry(){
+        return this.entry.value;
     }
 }
 
 class ObjectiveEntry{
     constructor(master_container, variables){
+        this.variables = variables;
         this.container = document.createElement("div");
+        this.container.className = "equation-entry";
         master_container.appendChild(this.container);
         this.objective_type = new DropdownOptions(this.container, [["Maximise", "maximise"], ["Minimise", "minimise"]]);
-        this.variables = variables;
         this.entries = this.setUpEntries();
     }
     setUpEntries(){
         let label = document.createElement("label");
-        label.textContent = "P = ";
+        label.textContent = "P";
+        this.container.appendChild(label);
+        label = document.createElement("label");
+        label.textContent = " = "; // so groups nicely for css
         this.container.appendChild(label);
         let entries = {};
         for (let variable of this.variables){
-            let current_entry = document.createElement("input");
-            current_entry.type = "number";
-            this.container.appendChild(current_entry);
-            entries[variable] = current_entry;
-            if (variable !== this.variables.at(-1)){
+            // let current_entry =  // document.createElement("input");
+            // current_entry.type = "number";
+            // this.container.appendChild(current_entry);
+            entries[variable] = new VarEntry(this.container, variable);
+            if (variable !== this.variables.at(-1)) {
                 label = document.createElement("label");
-                label.textContent = variable+" + ";
-                this.container.appendChild(label);
-            }else{
-                label = document.createElement("label");
-                label.textContent = variable;
+                label.textContent = " + ";
                 this.container.appendChild(label);
             }
         }
@@ -58,9 +121,9 @@ class ObjectiveEntry{
         let vars_dict = {};
         for (let variable of this.variables){
             try{
-                vars_dict[variable] = new SimplexNumber(fraction(this.entries[variable].value)).multiply(new SimplexNumber(-1));
+                vars_dict[variable] = new SimplexNumber(fraction(this.entries[variable].getEntry())).multiply(new SimplexNumber(-1));
             }catch(e){
-                throw "Invalid coefficient, "+this.entries[variable].value;
+                throw "Please enter valid numeric coefficients";
             }
         }
         return vars_dict;
@@ -69,31 +132,55 @@ class ObjectiveEntry{
         let vars_dict = {};
         for (let variable of this.variables){
             try{
-                vars_dict[variable] = new SimplexNumber(fraction(this.entries[variable].value));
+                vars_dict[variable] = new SimplexNumber(fraction(this.entries[variable].getEntry()));
             }catch(e){
-                throw "Invalid coefficient, "+this.entries[variable].value;
+                throw "Please enter valid numeric coefficients";
             }
         }
         return vars_dict;
     }
-    getProfitRow(){
-        let vars_dict = {};
-        let name = "P";
+    getVarsDict(){
         if (this.isMaximise()) {
-            vars_dict = this.getVarsDictMax();
+            return this.getVarsDictMax();
         } else {
-            vars_dict = this.getVarsDictMin();
+            return this.getVarsDictMin();
+        }
+    }
+    getProfitRow(){
+        let name = "P";
+        let vars_dict = this.getVarsDict()
+        if (this.isMaximise()) {
+        } else {
             name = "Q";
         }
-        return new ObjectiveRow(vars_dict, 0, name);
+        return new ObjectiveRow(vars_dict, new SimplexNumber(0), name);
+    }
+    getEquationString(){
+        let s = "";
+        if (this.isMaximise()) {
+            s += "Maximise P = ";
+        }else{
+            s += "Minimise P = ";
+        }
+        let vars_dict = this.getVarsDictMin();
+        for (let variable of this.variables){
+            if (variable !== this.variables[0]){
+                s += " + "
+            }
+            s += vars_dict[variable].getString() + variable
+        }
+        return s;
     }
 }
 
 class EquationEntry{
     constructor(master_container, variables, equation_type_change_function=()=>{}){
         this.container = document.createElement("div");
+        this.container.className = "constraint-entry";
         this.equation_container = document.createElement("div");
+        this.equation_container.className = "equation-entry";
         this.extra_vars_container = document.createElement("div");
+        this.extra_vars_container.className = "additional-vars-entry";
         this.container.appendChild(this.equation_container);
         this.container.appendChild(this.extra_vars_container);
         this.equation_type_change_function = equation_type_change_function;
@@ -101,8 +188,9 @@ class EquationEntry{
         master_container.appendChild(this.container);
         this.coef_entries = this.createCoefEntries();
         this.inequality_type = new DropdownOptions(this.equation_container, [["≤", "<="], ["≥", ">="]], this.updateInequalityType.bind(this));
-        this.value_entry = document.createElement("input");
-        this.equation_container.appendChild(this.value_entry);
+        this.value_entry = new VarEntry(this.equation_container, "");// document.createElement("input");
+        //this.value_entry.type = "number";
+        // this.equation_container.appendChild(this.value_entry);
         this.slack_var_entry = new LabelledTextInput(this.extra_vars_container, "Slack variable name:");
         this.artificial_var_entry = new LabelledTextInput(this.extra_vars_container, "Artificial variable name:");
         this.artificial_var_entry.hide();
@@ -122,12 +210,12 @@ class EquationEntry{
     getVarsDict(){
         let vars_dict = {};
         for (let variable of this.variables){
-            let current_value = this.coef_entries[variable].value;
-            if (current_value.length === 0) throw "Fill all cells";
+            let current_value = this.coef_entries[variable].getEntry();
+            if (current_value.length === 0) throw "Fill all entries with valid values";
             try{
                 vars_dict[variable] = new SimplexNumber(fraction(current_value));
             }catch(e){
-                throw "Invalid variable coefficient, "+current_value;
+                throw "Please enter valid numeric coefficients";
             }
         }
         let slack_var = this.slack_var_entry.getEntry()
@@ -143,12 +231,12 @@ class EquationEntry{
         return vars_dict;
     }
     getRowValue(){
-        let current_value = this.value_entry.value;
-        if (current_value.length === 0) throw "Fill all cells";
+        let current_value = this.value_entry.getEntry();
+        if (current_value.length === 0) throw "Fill all entries with valid values";
         try{
             return new SimplexNumber(fraction(current_value));
         }catch(e){
-            throw "Invalid value, "+current_value;
+            throw "Please enter valid numeric values";
         }
     }
     getEquationRow(){
@@ -156,25 +244,25 @@ class EquationEntry{
         if (this.isAnnoying()){
             row_name = this.getArtificialVar();
         } else{
-            row_name = this.getRowValue();
+            row_name = this.getSlackVar();
         }
         return new TableThingRow(this.getVarsDict(), this.getRowValue(), row_name);
     }
     createCoefEntries(){
         let entries_dict = {};
         for (let variable of this.variables){
-            let current_entry = document.createElement("input");
-            current_entry.type = "number";
-            this.equation_container.appendChild(current_entry);
-            entries_dict[variable] = current_entry;
+            // let current_entry = document.createElement("input");
+            // current_entry.type = "number";
+            // this.equation_container.appendChild(current_entry);
+            entries_dict[variable] = new VarEntry(this.equation_container, variable); // current_entry;
             if (variable !== this.variables.at(-1)){
                 let label = document.createElement("label");
-                label.textContent = variable+" + ";
+                label.textContent = " + ";
                 this.equation_container.appendChild(label);
-            } else{
-                let label = document.createElement("label");
-                label.textContent = variable;
-                this.equation_container.appendChild(label);
+            // } else{
+                // let label = document.createElement("label");
+                // label.textContent = variable;
+                // this.equation_container.appendChild(label);
             }
         }
         return entries_dict;
@@ -189,16 +277,41 @@ class EquationEntry{
             this.equation_type_change_function();
         }
     }
+    getEquationString(){
+        let s = "";
+        let vars_dict = this.getVarsDict();
+        for (let variable of this.variables){
+            if (variable !== this.variables[0]){
+                s += " + "
+            }
+            s += vars_dict[variable].getString() + variable
+        }
+        if (this.isAnnoying()){
+            s += " ≥ ";
+        } else{
+            s += " ≤ ";
+        }
+        s += this.getRowValue().getString();
+        if (this.isAnnoying()){
+            s += " ("+this.getSlackVar()+", "+this.getArtificialVar()+")";
+        } else{
+            s += " ("+this.getSlackVar()+")";
+        }
+        return s;
+    }
 
 }
 class EquationSystemEntry{
-    constructor(master_container, variables){
+    constructor(master_container, variables, enter_function){
         this.container = document.createElement("div");
+        this.container.className = "one-col-grid";
         this.equation_container = document.createElement("div");
         this.buttons_container = document.createElement("div");
+        this.buttons_container.className = "two-col-grid";
         this.container.appendChild(this.equation_container);
         this.container.appendChild(this.buttons_container);
         master_container.appendChild(this.container);
+        this.enter_function = enter_function;
         this.variables = variables;
         this.objective_entry = new ObjectiveEntry(this.equation_container, this.variables);
         this.equations = [];
@@ -206,7 +319,20 @@ class EquationSystemEntry{
         this.two_stage_checkbox.hide();
         this.setUpButtons();
         this.feedback_label = document.createElement("label");
+        this.feedback_label.className = "feedback-label";
+        this.enter_button = document.createElement("button");
+        this.enter_button.textContent = "Enter";
+        this.enter_button.addEventListener("click", ()=>{this.enterEquation()})
+        this.container.appendChild(this.enter_button);
         this.container.appendChild(this.feedback_label);
+    }
+    enterEquation(){
+        let simplex = this.createSimplexSystem();
+        console.log("hello world");
+        if (simplex !== null){
+            console.log("hi!!");
+            this.enter_function(simplex);
+        }
     }
     addEquation(){
         let equation = new EquationEntry(this.equation_container, this.variables, this.updateInequalityTypes.bind(this));
@@ -225,23 +351,30 @@ class EquationSystemEntry{
         if (this.equations.length !== 0){
             let last_equation_entry = this.equations.pop();
             last_equation_entry.removeContainer()
+            this.updateInequalityTypes();
         }
     }
+    removeContainer(){
+        this.container.remove();
+    }
     setUpButtons(){
-        let button_container = document.createElement("div");
+        // let button_container = document.createElement("div");
         let add_button = document.createElement("button");
         add_button.addEventListener("click", () => {this.addEquation()});
         add_button.textContent = "Add";
         let remove_button = document.createElement("button");
         remove_button.addEventListener("click", () => {this.removeEquation()});
         remove_button.textContent = "Remove";
-        button_container.appendChild(add_button);
-        button_container.appendChild(remove_button);
-        this.container.appendChild(button_container);
+        this.buttons_container.appendChild(add_button);
+        this.buttons_container.appendChild(remove_button);
+        this.container.appendChild(this.buttons_container);
     }
     createSimplexSystem(){
         if (!this.areExtraVarNamesValid()){
             this.showInvalidVarNamesError();
+            return null;
+        } else if (this.equations.length === 0){
+            this.showNotEnoughEquationsError();
             return null;
         }
         try{
@@ -264,19 +397,28 @@ class EquationSystemEntry{
                     this.clearErrors();
                     return new TwoStageSimplex(equations, objective, i_row, artificial_vars, this.getVarNames());
                 }else{
+                    let simplex = new Simplex(equations, objective, this.getVarNames());
                     objective.updateForBigM(annoying_rows);
                     this.clearErrors();
-                    return new Simplex(equations, objective, this.getVarNames());
+                    return simplex;
                 }
             }else{
                 this.clearErrors();
                 return new Simplex(equations, objective, this.getVarNames());
             }
         } catch (e){
+            console.log("error.............................................................");
+            console.log(e);
             this.showError(e);
+            console.log(e);
+            return null;
         }
     }
+    showNotEnoughEquationsError(){
+        this.feedback_label.textContent = "Enter at least 1 equation";
+    }
     showError(e){
+        console.log("here");
         this.feedback_label.textContent = e;
     }
     clearErrors(){
@@ -299,26 +441,103 @@ class EquationSystemEntry{
         return slack_vars;
     }
     getVarNames(){
-        return this.variables + this.getSlackVars() + this.getArtificialVars();
+        // console.log("vars 3", this.variables);
+        // console.log("vars 4", this.variables + [this.getSlackVars()] + [this.getArtificialVars()]);
+        let slack_vars = this.getSlackVars();
+        let artificial_vars = this.getArtificialVars();
+        let variables = this.variables;
+        if (slack_vars.length > 0){
+            variables = variables.concat(slack_vars);
+        }
+        if (artificial_vars.length > 0){
+            variables = variables.concat(artificial_vars);
+        }
+        return variables;
     }
     showInvalidVarNamesError(){
         this.feedback_label.textContent = "Please enter valid, unique values for the slack and artificial variables";
     }
     areExtraVarNamesValid(){
         let var_names = this.getVarNames();
-        for (let var_name_index of var_names.length){
-            if (var_names.filter(x => x === var_names[var_name_index]).length > 1){
-                return false;
-            } else if (Number(var_names[var_name_index]) !== undefined){
-                return false;
-            }
+        console.log("variables", var_names);
+        console.log(new Set(var_names).size);
+        console.log(var_names.length)
+        if (new Set(var_names).size !== var_names.length) {
+            return false;
         }
+        // for (let var_name of var_names){
+             // if (Number(var_name) !== undefined){
+                // return false;
+            // }
+        // }
         return true;
+    }
+    getBiggerThanZeroConstraintString(){
+        return this.getVarNames().join(",") + "≥ 0";
+    }
+    getEquationStrings(){
+        let equation_strings = [this.objective_entry.getEquationString()];
+        for (let equation of this.equations){
+            equation_strings.push(equation.getEquationString());
+        }
+        equation_strings.push(this.getBiggerThanZeroConstraintString());
+        if (!this.objective_entry.isMaximise()){
+            equation_strings.push("Q = -P");
+        }
+        return equation_strings;
     }
 
 }
 
+class FullEquationSystemEntry{
+    constructor(master_container, entered_setup_info_func){
+        this.container = document.createElement("div");
+        // this.container.className = "initial-info";
+        master_container.appendChild(this.container);
+        this.entered_setup_info_func = entered_setup_info_func;
+        this.variables = [];
+        this.initial_variables_entry = new DecisionVarsEntry(this.container, this.enterInitialVariables.bind(this));
+        this.equation_entry = null;
+        this.equations_string_container = document.createElement("div");
+        this.equations_string_container.className = "one-col-grid";
+        this.container.appendChild(this.equations_string_container);
+    }
+    showEquationEntry(variables){
+        this.equation_entry = new EquationSystemEntry(this.container, variables, this.enterSimplexSystem.bind(this));
+    }
+    enterInitialVariables(variables){
+        console.log("vars2", variables);
+        this.initial_variables_entry.removeEntry();
+        this.showEquationEntry(variables);
+    }
+    showString(){
+        let equation_strings = this.equation_entry.getEquationStrings();
+        for (let equation of equation_strings){
+            let current_label = document.createElement("label");
+            current_label.textContent = equation;
+            this.equations_string_container.appendChild(current_label);
+        }
+    }
+    enterSimplexSystem(simplex){
+        console.log("Here");
+        this.showString();
+        this.equation_entry.removeContainer();
+        this.entered_setup_info_func(simplex);
+    }
+    hide(){
+        this.container.style.display = "none";
+    }
+    show(){
+        this.container.style.display = "block";
+    }
+}
 
-let b = document.getElementById("set_up_container");
-let a = new EquationSystemEntry(b, ["x", "y", "z"]);
+function test(a){
+    console.log("test");
+}
+
+// let a = document.getElementById("set_up_container");
+// let b = new FullEquationSystemEntry(a, test)
+// let a = new EquationSystemEntry(b, ["x", "y", "z"]);
 // let c = new ObjectiveEntry(b, ["x", "y", "z"]);
+export {FullEquationSystemEntry};

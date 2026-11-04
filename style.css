@@ -61,12 +61,25 @@ h2 {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
+select {
+    border: 1px solid var(--border-grey);
+    padding: 5px 10px 5px 10px;
+    margin: 2px;
+    font-family: inherit;
+    font-size: inherit;
+    cursor: inherit;
+    line-height: inherit;
+    background-color: transparent;
+    border-radius: 8px;
+}
+
 
 .initial-info {
     width: 100%;
     max-width: 100%;
+    min-width: 0;
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 2fr));
+    grid-template-columns: repeat(1, minmax(0, 1fr));
     gap: 20px 30px;
     align-items: center;
     padding: 24px;
@@ -77,22 +90,34 @@ h2 {
 
 
 .labelled-input,
-.labelled-checkbox {
+.labelled-checkbox,
+.labelled-text-input{
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 2fr));
     align-items: center;
     gap: 12px;
     min-width: 0;
+    padding: 10px;
+    margin: 5px auto;
 }
 
 .labelled-input label,
-.labelled-checkbox label {
+.labelled-checkbox label,
+.labelled-text-input label{
     font-weight: 600;
     color: var(--text-grey);
 }
 
 .labelled-input input {
     width: 85px;
+    max-width: 100%;
+    padding: 7px 9px;
+    background: white;
+    border: 1px solid var(--border-grey);
+    border-radius: 5px;
+}
+.labelled-text-input input {
+    width:150px;
     max-width: 100%;
     padding: 7px 9px;
     background: white;
@@ -106,6 +131,15 @@ h2 {
     accent-color: var(--main-grey);
 }
 
+.decision-vars-entry{
+    width: 100%;
+    padding: 7px 9px;
+    max-width: 100%;
+    align-items: center;
+    align-content: center;
+    display: flex;
+    text-align: center;
+}
 
 
 input[type="text"],
@@ -174,19 +208,73 @@ input:focus {
     font-weight: 600;
 }
 
-.lower-container {
-    width: 100%;
-    display: grid;
-    text-align: center;
-    grid-template-columns: repeat(2, minmax(0, 2fr));
-    column-gap: 20px;
+.equation-entry{
+    display: flex;
+    /*flex-wrap: wrap;*/
+    padding: 10px;
+    gap: 4px;
 }
-.onecol-lower-container {
+.equation-entry input,
+.var-entry input {
+    width: 50%;
+    flex-wrap: wrap;
+    margin: 3px;
+    padding: 4px 2px;
+    font-size: clamp(9px, 1.1vw, 12px);
+    align-content: center;
+    background: var(--input-grey);
+    color: var(--text-grey);
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+    max-width: 50%;
+}
+
+
+.additional-vars-entry{
+    width: 100%;
+    max-width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 2fr));
+    gap: 10px 10px;
+    align-items: center;
+    padding: 10px;
+    column-gap: 10px;
+}
+
+.constraint-entry{
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    flex-wrap: wrap;
+    display: grid;
+    /*grid-template-columns: repeat(2, minmax(0, 2fr));*/
+    gap: 15px 20px;
+    align-items: center;
+    padding: 20px;
+    background: var(--light-grey);
+    border: 1px solid var(--border-grey);
+    border-radius: 8px;
+}
+
+
+.two-col-grid {
+    width: 100%;
+    max-width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 2fr));
+    gap: 10px 30px;
+    align-items: center;
+    column-gap: 20px;
+    padding: 10px 0;
+}
+.one-col-grid {
     width: 100%;
     display: grid;
     text-align: center;
     grid-template-columns: repeat(1, minmax(0, 2fr));
     column-gap: 20px;
+    padding: 10px 0;
+    align-items: center;
 }
 
 .table_thing {
@@ -262,7 +350,11 @@ button:active {
     transform: scale(0.98);
 }
 
-
+.decision-vars-entry button{
+    display: flex;
+    width: 25%;
+    justify-content: center;
+}
 label {
     color: var(--text-grey);
 }

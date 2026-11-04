@@ -4,8 +4,6 @@ import SimplexNumber from "./SimplexNumber.js";
 import {fraction} from "mathjs";
 import {DropdownOptions} from "./LabelledEntries.js";
 
-// todo add note about selecting first value as pivot value and fix instructions being shown
-// todo add inequality for all variables being bigger than zero
 // todo fix fill all cells error which is appearing instead of an invalid number error
 
 

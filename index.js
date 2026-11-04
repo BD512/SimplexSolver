@@ -7,6 +7,9 @@ export default class SimplexSystem {
     constructor(master_container, simplex, show_initial_vals=false) {
         this.container = document.createElement("div");
         master_container.appendChild(this.container);
+        this.label = document.createElement("label");
+        this.container.appendChild(this.label);
+        this.label.textContent = "When selecting pivot column, use the first one along. Don't enter brackets for any big-M expressions - expand them.";
         this.tables_container = document.createElement("div");
         this.lower_container = document.createElement("div");
         this.lower_container.className = "two-col-grid";

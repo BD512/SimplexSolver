@@ -503,6 +503,9 @@ class FullEquationSystemEntry{
         this.container.appendChild(this.equations_string_container);
     }
     showEquationEntry(variables){
+        this.label = document.createElement("label");
+        this.label.textContent = "All variables ≥ 0";
+        this.container.appendChild(this.label);
         this.equation_entry = new EquationSystemEntry(this.container, variables, this.enterSimplexSystem.bind(this));
     }
     enterInitialVariables(variables){

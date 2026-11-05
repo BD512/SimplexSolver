@@ -5,7 +5,7 @@ import {fraction} from "mathjs";
 import {DropdownOptions} from "./LabelledEntries.js";
 
 // todo fix fill all cells error which is appearing instead of an invalid number error
-
+// todo - when moving on to 2-stage, do you need to write the table twice
 
 class DecisionVarsEntry{
     constructor(master_container, feedback_function){
@@ -257,7 +257,7 @@ class EquationEntry{
                 let label = document.createElement("label");
                 label.textContent = " + ";
                 this.equation_container.appendChild(label);
-            // } else{
+                // } else{
                 // let label = document.createElement("label");
                 // label.textContent = variable;
                 // this.equation_container.appendChild(label);
@@ -464,9 +464,9 @@ class EquationSystemEntry{
             return false;
         }
         // for (let var_name of var_names){
-             // if (Number(var_name) !== undefined){
-                // return false;
-            // }
+        // if (Number(var_name) !== undefined){
+        // return false;
+        // }
         // }
         return true;
     }

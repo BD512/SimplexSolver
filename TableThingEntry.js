@@ -55,9 +55,10 @@ export class TableEntryBox {
 }
 
 export default class TableThingEntry {
-    constructor(master_container, id_number, simplex_instance, finished_func){
+    constructor(master_container, id_number, simplex_instance, finished_func, final_table=false){
         this.container = document.createElement("table");
         master_container.appendChild(this.container);
+        this.final_table = final_table;
         this.id_number = id_number;
         this.container.id = id_number + "table_thing";
         this.container.className = "table_thing";
@@ -122,7 +123,7 @@ export default class TableThingEntry {
         let current_id = 1;
         let cells = [];
         for (let row of this.simplex_instance.getRows()) {
-            let show_theta_entry = !row.isObjective();
+            let show_theta_entry = !row.isObjective() && !this.final_table;
             let [new_cells, new_id] = this.addRow(row, current_id, headers, show_theta_entry);
             current_id = new_id;
             cells.push(new_cells);
@@ -178,6 +179,7 @@ export default class TableThingEntry {
         for (let row of this.entries){
             for (let col of row){
                 if (!(col.isCorrect())){
+                    console.log("here 9999", col);
                     return false;
                 }
             }

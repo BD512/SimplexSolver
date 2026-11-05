@@ -67,6 +67,7 @@ export default class SimplexSystem {
     checkAnswers(){
         let is_correct = this.current_table.isFinished();
         if (!is_correct){
+            console.log("here512............................")
             this.feedback_label.textContent = "Some entries are incorrect or empty";
         } else{
             this.nextTable();
@@ -80,15 +81,20 @@ export default class SimplexSystem {
     }
     nextTable(){
         // this.current_table.showAnswer();
+        console.log("Moving on to the next table........");
         this.resetForIteration();
         this.tables.push(this.current_table);
         let is_finished = this.simplex.performIteration();
         if (is_finished && this.simplex.isStage1() && this.simplex.isZeroed()){
+            console.log("Here!!!!!!!!!!!!! Trying to move to stage 2");
             this.simplex = this.simplex.getStage2();
+            let show_theta = this.simplex.isFinal();
+            this.current_table = new TableThingEntry(this.tables_container, 1, this.simplex, this.iterationFinished.bind(this), show_theta);
         } else if (is_finished) {
             this.showFinished();
         } else {
-            this.current_table = new TableThingEntry(this.tables_container, 1, this.simplex, this.iterationFinished.bind(this));
+            let show_theta = this.simplex.isFinal();
+            this.current_table = new TableThingEntry(this.tables_container, 1, this.simplex, this.iterationFinished.bind(this), show_theta);
         }
     }
     showFinished(){

@@ -117,11 +117,22 @@ export class ObjectiveRow extends TableThingRow {
 function processExtraRowsCoefs(extra_rows, artificial_vars){
     let vars_dict = {};
     for (let extra_row of extra_rows){
-        for (let variable of artificial_vars){
-            if (!Object.hasOwn(vars_dict, variable)){
-                vars_dict[variable] = new SimplexNumber(-1).multiply(extra_row.getVarCoef(variable)); // todo check this
-            } else {
-                vars_dict[variable] = vars_dict[variable].add(new SimplexNumber(-1).multiply(extra_row.getVarCoef(variable)));
+        for (let variable of extra_row.getVarNames()){// artificial_vars){
+            if (!(artificial_vars.includes(variable))){ // or .has?
+                let current_val = extra_row.getVarCoef(variable);
+                if (current_val === undefined) {
+                    current_val = new SimplexNumber(0);
+                }
+                if (!Object.hasOwn(vars_dict, variable)) {
+                    console.log("Type....", typeof extra_row.getVarCoef(variable));
+                    console.log(extra_row.getVarCoef(variable));
+                    console.log(extra_row);
+                    console.log("Row type", typeof extra_row);
+                    console.log("variable", variable);
+                    vars_dict[variable] = new SimplexNumber(-1).multiply(current_val); // todo check this
+                } else {
+                    vars_dict[variable] = vars_dict[variable].add(new SimplexNumber(-1).multiply(current_val));
+                }
             }
         }
     }
@@ -175,6 +186,10 @@ export default class Simplex {
                 row.addVar(var_name);
             }
         }
+    }
+    isFinal(){
+        let [is_finished, pivot_row, pivot_var_name] = this.getPivot();
+        return (is_finished || pivot_row === null);
     }
     getNextPivotRow(pivot_var_name){
         let min_theta_value = new SimplexNumber(Infinity);
@@ -244,6 +259,10 @@ export class TwoStageSimplex extends Simplex {
     isZeroed() {
         return this.objective_row.isZeroed();
     }
+    isFinal() {
+        return false; // todo check about this
+    }
+
     removeVars(variables) {
         console.log("attempting to remove variables", variables);
         for (let variable of variables) {
@@ -253,7 +272,7 @@ export class TwoStageSimplex extends Simplex {
                 row.deleteVar(variable);
             }
         }
-    }
+    } // todo add isFinal here which returns false??
 }
 
 class SimplexTerminalUI extends Simplex {

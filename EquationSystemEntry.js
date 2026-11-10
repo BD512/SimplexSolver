@@ -6,6 +6,7 @@ import {DropdownOptions} from "./LabelledEntries.js";
 
 // todo fix fill all cells error which is appearing instead of an invalid number error
 // todo - when moving on to 2-stage, do you need to write the table twice
+// todo make so if multiple lowest columns, calculates multiple theta values and chooses the lowest out of them
 
 class DecisionVarsEntry{
     constructor(master_container, feedback_function){

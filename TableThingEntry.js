@@ -63,10 +63,10 @@ export default class TableThingEntry {
         this.container.id = id_number + "table_thing";
         this.container.className = "table_thing";
         this.simplex_instance = simplex_instance;
-        let [finished, pivot_var] = this.simplex_instance.getPivotColName();
+        let [finished, pivot_vars] = this.simplex_instance.getPivotColName();
         this.finished = finished;
-        this.showing_answer = false;
-        this.pivot_var = pivot_var
+        // this.showing_answer = false;
+        // this.pivot_vars = pivot_vars
         this.finished_func = finished_func;
         this.update = () => {
             if (this.isFinished()) {
@@ -84,7 +84,7 @@ export default class TableThingEntry {
     showInitialValues(){
         let first_row = this.entries[0];
         for (let row of this.entries){
-            for (let entry of row.slice(0, first_row.length-1)){
+            for (let entry of row.slice(0, first_row.length)){
                 entry.permanentlyFillVal();
             }
         }
@@ -155,10 +155,13 @@ export default class TableThingEntry {
         current_row.appendChild(current_cell);
         if (theta){
             let current_cell = document.createElement("td");
-            console.log("is undefined?", row.getThetaValue(this.pivot_var));
-            let value_entry = new TableEntryBox(current_cell, this.id_number+current_id, row.getThetaValue(this.pivot_var), this.update);
-            current_id ++;
-            current_row_cells.push(value_entry);
+            // console.log("is undefined?", row.getThetaValue(this.pivot_var));
+            let value_entry = document.createElement("input");// new TableEntryBox(current_cell, this.id_number+current_id, row.getThetaValue(this.pivot_var), this.update);
+            value_entry.type = "text";
+            value_entry.className = "TableEntry";
+            current_cell.appendChild(value_entry);
+            // current_id ++;
+            // current_row_cells.push(value_entry);
             current_row.appendChild(current_cell);
         } else {
             let current_cell = document.createElement("td");

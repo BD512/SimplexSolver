@@ -9,7 +9,7 @@ export default class SimplexSystem {
         master_container.appendChild(this.container);
         this.label = document.createElement("label");
         this.container.appendChild(this.label);
-        this.label.textContent = "When selecting pivot column, use the first one along. Don't enter brackets for any big-M expressions - expand them.";
+        this.label.textContent = "Don't enter brackets for any big-M expressions - expand them. Theta values and working aren't marked so put them in whatever format you want (e.g. if there are multiple theta values that need to be found, you could write your working by seperating by commas).";
         this.tables_container = document.createElement("div");
         this.lower_container = document.createElement("div");
         this.lower_container.className = "two-col-grid";
@@ -19,9 +19,6 @@ export default class SimplexSystem {
         this.showing_answer = false;
         this.tables = [];
         this.current_table = new TableThingEntry(this.tables_container, 1, this.simplex, this.iterationFinished.bind(this));
-        if (show_initial_vals) {
-            this.current_table.showInitialValues();
-        }
         this.next_table_button = document.createElement("button");
         // this.next_table_button.type = "button";
         this.next_table_button.addEventListener("click", this.nextButtonPressed.bind(this));
@@ -37,6 +34,10 @@ export default class SimplexSystem {
         this.container.appendChild(this.feedback_label);
         this.finished_label = document.createElement("label");
         this.container.appendChild(this.finished_label);
+        if (show_initial_vals) {
+            this.current_table.showInitialValues();
+            this.nextTable()
+        }
     }
     answerButtonPressed() {
         if (this.showing_answer) {
@@ -148,6 +149,9 @@ class Main {
         console.log("here");
         this.initial_table_thing_entry.hideDropdown();
         this.tables = new SimplexSystem(this.container, simplex, show_initial_vals);
+        // if (show_initial_vals){
+            // this.tables.nextTable();
+        // }
     }
 }
 

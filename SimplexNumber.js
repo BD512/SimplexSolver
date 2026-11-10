@@ -109,6 +109,9 @@ export default class SimplexNumber {
             return (compare(this.getMCoef(), other.getMCoef()) < 0);
         }
     }
+    isEqualTo(other){
+        return (equal(this.getMCoef(), other.getMCoef()) && equal(this.getNumberTerm(), other.getNumberTerm())); // todo correct for possible infinity
+    }
     isHigherThan(other) {
         if (other.number_term === Infinity) return false;
         if (this.number_term === Infinity) return true;

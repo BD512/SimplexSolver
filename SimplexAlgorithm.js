@@ -29,6 +29,8 @@ export class TableThingRow {
         return this.row_var_name;
     }
     getThetaValue(pivot_var_name) {
+        console.log("Row value", this.row_value);
+        console.log("Pivot var name", pivot_var_name);
         return this.row_value.divide(this.variables[pivot_var_name]); // todo
     }
     getVarCoef(var_name) {
@@ -92,18 +94,23 @@ export class ObjectiveRow extends TableThingRow {
     getThetaValue(pivot_var_name) {
         return new SimplexNumber(Infinity);
     }
-    checkForLowestVal() {
+    checkForLowestVal() { // todo update any usages as this is going to return a list instead
         let lowest_val = new SimplexNumber(0, 1);
-        let lowest_variable = null;
+        let lowest_variables = [];
         for (let current_var of Object.keys(this.variables)){
             // console.log(this.variables[current_var]);
             // console.log(this.variables);
-            if (this.variables[current_var].isLowerThan(lowest_val)){
-                lowest_variable = current_var;
+            if (this.variables[current_var].isEqualTo(lowest_val)){
+                lowest_variables.push(current_var);
+            }
+            else if (this.variables[current_var].isLowerThan(lowest_val)){
+                lowest_variables = [];
+                lowest_variables.push(current_var);
                 lowest_val = this.variables[current_var]
             }
         }
-        return [lowest_val.getValue() >= 0, lowest_variable];
+        console.log("Variable names", lowest_variables);
+        return [lowest_val.getValue() >= 0, lowest_variables];
         // todo find the lowest value by comparing actual values
     }
     isZeroed(){
@@ -191,27 +198,32 @@ export default class Simplex {
         let [is_finished, pivot_row, pivot_var_name] = this.getPivot();
         return (is_finished || pivot_row === null);
     }
-    getNextPivotRow(pivot_var_name){
+    getNextPivotRow(pivot_var_names){
         let min_theta_value = new SimplexNumber(Infinity);
         let pivot_row = null;
-        for (let row of this.table_thing_rows) {
-            let current_theta_val = row.getThetaValue(pivot_var_name);
-            if (0 < current_theta_val.getValue() && current_theta_val.isLowerThan(min_theta_value)) {
-                min_theta_value = current_theta_val;
-                pivot_row = row;
+        console.log("Pivot var names");
+        let final_pivot_var_name = null;
+        for (let pivot_var_name of pivot_var_names){
+            for (let row of this.table_thing_rows) {
+                let current_theta_val = row.getThetaValue(pivot_var_name);
+                if (0 < current_theta_val.getValue() && current_theta_val.isLowerThan(min_theta_value)) {
+                    min_theta_value = current_theta_val;
+                    pivot_row = row;
+                    final_pivot_var_name = pivot_var_name;
+                }
             }
         }
         console.log("pivot...........................", pivot_row);
-        return pivot_row;
+        return [pivot_row, final_pivot_var_name];
     }
     getPivotColName() {  // todo sort divide by zero for theta values
-        let [is_finished, pivot_var_name] = this.objective_row.checkForLowestVal();
-        return [is_finished, pivot_var_name];
+        let [is_finished, pivot_var_names] = this.objective_row.checkForLowestVal();
+        return [is_finished, pivot_var_names];
     }
-    getPivot(){
-        let [is_finished, pivot_var_name] = this.objective_row.checkForLowestVal();
-        let pivot_row = this.getNextPivotRow(pivot_var_name);
-        return [is_finished, pivot_row, pivot_var_name];
+    getPivot(){ // todo update this!!
+        let [is_finished, pivot_var_names] = this.objective_row.checkForLowestVal();
+        let [pivot_row, final_pivot_var_name] = this.getNextPivotRow(pivot_var_names);
+        return [is_finished, pivot_row, final_pivot_var_name];
     }
     performIteration(){
         let [is_finished, pivot_row, pivot_var_name] = this.getPivot();

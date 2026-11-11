@@ -9,7 +9,7 @@ export default class SimplexSystem {
         master_container.appendChild(this.container);
         this.label = document.createElement("label");
         this.container.appendChild(this.label);
-        this.label.textContent = "Don't enter brackets for any big-M expressions - expand them. Theta values and working aren't marked so put them in whatever format you want (e.g. if there are multiple theta values that need to be found, you could write your working by seperating by commas). If multiple theta values are the same, choose the first one."; // todo check this is actually the case
+        this.label.textContent = "Don't enter brackets for any big-M expressions - expand them. Theta values and working aren't marked so put them in whatever format you want (e.g. if there are multiple theta values that need to be found, you could write your working by seperating by commas). If multiple theta values are the same, choose the first one. If you want to make the cells purple for any reason (e.g. mark a pivot), click on them around the entry box. To make not purple, click again."; // todo check this is actually the case
         this.tables_container = document.createElement("div");
         this.lower_container = document.createElement("div");
         this.lower_container.className = "two-col-grid";

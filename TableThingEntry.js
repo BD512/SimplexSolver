@@ -56,6 +56,8 @@ export class TableEntryBox {
 
 export default class TableThingEntry {
     constructor(master_container, id_number, simplex_instance, finished_func, final_table=false){
+        this.selected_colour = "#e0c5fa";
+        this.unselected_colour = "#ffffff";
         this.container = document.createElement("table");
         master_container.appendChild(this.container);
         this.final_table = final_table;
@@ -130,6 +132,24 @@ export default class TableThingEntry {
         }
         return cells;
     }
+    createCell(){
+        let current_cell = document.createElement("td");
+        current_cell.addEventListener("click", (event) => {
+            if (event.target !== event.currentTarget) {
+                return;
+            }
+            current_cell.selected = !current_cell.selected;
+
+            if (current_cell.selected) {
+                current_cell.style.backgroundColor = this.selected_colour;
+                console.log("Changing to purple!");
+            } else{
+                console.log("Changing to not purple")
+                current_cell.style.backgroundColor = this.unselected_colour;
+            }
+        })
+        return current_cell;
+    }
     addRow(row, current_id, headers, theta=true){
         let current_row_cells = [];
         let current_row = document.createElement("tr");
@@ -138,7 +158,7 @@ export default class TableThingEntry {
         header.textContent = row.getVarName();
         current_row.appendChild(header);
         for (let col of headers) {
-            let current_cell = document.createElement("td");
+            let current_cell = this.createCell();
             console.log("is undefined?", row.getVarCoef(col));
             let current_entry = new TableEntryBox(current_cell, this.id_number+current_id, row.getVarCoef(col), this.update);
             current_row_cells.push(current_entry);
@@ -146,7 +166,7 @@ export default class TableThingEntry {
             current_row.appendChild(current_cell);
         }
         // create entry for the answer
-        let current_cell = document.createElement("td");
+        let current_cell = this.createCell(); // document.createElement("td");
         console.log("is undefined?", row.getValue());
         let value_entry = new TableEntryBox(current_cell, this.id_number+current_id, row.getValue(), this.update);
         current_row_cells.push(value_entry);
@@ -154,7 +174,7 @@ export default class TableThingEntry {
         // cells.push(current_row_cells);
         current_row.appendChild(current_cell);
         if (theta){
-            let current_cell = document.createElement("td");
+            let current_cell = this.createCell();// document.createElement("td");
             // console.log("is undefined?", row.getThetaValue(this.pivot_var));
             let value_entry = document.createElement("input");// new TableEntryBox(current_cell, this.id_number+current_id, row.getThetaValue(this.pivot_var), this.update);
             value_entry.type = "text";
@@ -164,12 +184,12 @@ export default class TableThingEntry {
             // current_row_cells.push(value_entry);
             current_row.appendChild(current_cell);
         } else {
-            let current_cell = document.createElement("td");
+            let current_cell = this.createCell(); // document.createElement("td");
             current_cell.textContent = "-";
             current_id ++;
             current_row.appendChild(current_cell);
         }
-        let cell = document.createElement("td");
+        let cell = this.createCell(); // document.createElement("td");
         let working_entry = document.createElement("input");
         working_entry.type = "text";
         working_entry.className = "TableEntry";
